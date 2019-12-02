@@ -18,6 +18,32 @@ pub fn solve_a() {
     println!("Opcode at 0 is {}", op_codes[0]);
 }
 
+pub fn solve_b() {
+    let contents = read_content("src/question_2/input.txt");
+    let numbers: Vec<usize> = contents.split(",").map(|number| usize::from_str(number).unwrap()).collect();
+
+    let mut op_codes = [0usize; 512];
+
+    for i in 0..=99 {
+        for j in 0..=99 {
+            op_codes = [0; 512];
+            for (index, number) in numbers.iter().enumerate() {
+                match index {
+                    1 => op_codes[index] = i,
+                    2 => op_codes[index] = j,
+                    _ => op_codes[index] = *number
+                }
+            }
+
+            run_program(&mut op_codes);
+            if op_codes[0] == 19690720 {
+                println!("Found! Result = 100*{}+{}={}", i, j, (100*i) + j);
+                return;
+            }
+        }
+    }
+}
+
 fn run_program(op_codes: &mut [usize]) {
     let mut current_position = 0usize;
     let mut current_opcode = op_codes[current_position];
