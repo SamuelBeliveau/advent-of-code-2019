@@ -1,3 +1,5 @@
+use crate::util::extract_numbers;
+
 pub fn solve_a() {
     let min = 152085u32;
     let max = 670283u32;
@@ -10,20 +12,6 @@ pub fn solve_a() {
     }
 
     println!("Count: {}", passwords_count);
-}
-
-fn extract_numbers(number: u32) -> Vec<u8> {
-    let mut n = number;
-    let mut numbers = Vec::new();
-
-    while n > 0 {
-        numbers.push((n % 10) as u8);
-        n = n / 10;
-    }
-
-    numbers.reverse();
-
-    numbers
 }
 
 fn has_correct_format(numbers: Vec<u8>) -> bool {
@@ -65,6 +53,7 @@ fn has_correct_format(numbers: Vec<u8>) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::util::extract_numbers;
 
     #[test]
     fn test_extract_numbers() {

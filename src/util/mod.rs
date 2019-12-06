@@ -9,3 +9,17 @@ pub fn read_content(path: &str) -> String {
         .expect("Failed to read file!");
     content
 }
+
+pub fn extract_numbers(number: u32) -> Vec<u8> {
+    let mut n = number;
+    let mut numbers = Vec::new();
+
+    while n > 0 {
+        numbers.push((n % 10) as u8);
+        n = n / 10;
+    }
+
+    numbers.reverse();
+
+    numbers
+}
