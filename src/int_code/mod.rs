@@ -1,21 +1,21 @@
 use std::io::stdin;
 use crate::util::extract_numbers;
 
-pub fn run_program(op_codes: &mut [i32], inputs: &Vec<i32>, current_position: &mut usize) -> Option<i32> {
+pub fn run_program(op_codes: &mut [i64], inputs: &Vec<i64>, current_position: &mut usize, relative_base: &mut i64) -> Option<i64> {
     let mut current_instruction = get_next_instruction(&op_codes, current_position);
     let mut input_index = 0usize;
 
     while current_instruction.op_code != OpCode::End {
         match current_instruction.op_code {
             OpCode::Add => {
-                let first_operand = get_parameter_value(&current_instruction.parameters[0], &op_codes);
-                let second_operand = get_parameter_value(&current_instruction.parameters[1], &op_codes);
+                let first_operand = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                let second_operand = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
 
                 op_codes[current_instruction.parameters[2].value as usize] = first_operand + second_operand;
             }
             OpCode::Multiply => {
-                let first_operand = get_parameter_value(&current_instruction.parameters[0], &op_codes);
-                let second_operand = get_parameter_value(&current_instruction.parameters[1], &op_codes);
+                let first_operand = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                let second_operand = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
 
                 op_codes[current_instruction.parameters[2].value as usize] = first_operand * second_operand;
             }
@@ -36,33 +36,37 @@ pub fn run_program(op_codes: &mut [i32], inputs: &Vec<i32>, current_position: &m
                 }
             }
             OpCode::Output => {
-                let output_value = op_codes[current_instruction.parameters[0].value as usize];
-                println!("Output is: {}", output_value);
-                return Some(output_value);
+                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                println!("Output is: {}", first_param);
+                return Some(first_param);
             }
             OpCode::JumpIfTrue => {
-                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes);
-                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes);
+                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
                 if first_param != 0 {
                     *current_position = second_param as usize;
                 }
             }
             OpCode::JumpIfFalse => {
-                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes);
-                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes);
+                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
                 if first_param == 0 {
                     *current_position = second_param as usize;
                 }
             }
             OpCode::LessThan => {
-                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes);
-                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes);
+                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
                 op_codes[current_instruction.parameters[2].value as usize] = if first_param < second_param { 1 } else { 0 };
             }
             OpCode::Equal => {
-                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes);
-                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes);
+                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
                 op_codes[current_instruction.parameters[2].value as usize] = if first_param == second_param { 1 } else { 0 };
+            }
+            OpCode::AdjustRelativeBase => {
+                let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
+                *relative_base += first_param;
             }
             _ => {}
         }
@@ -73,15 +77,15 @@ pub fn run_program(op_codes: &mut [i32], inputs: &Vec<i32>, current_position: &m
     None
 }
 
-fn get_parameter_value(parameter: &Parameter, op_codes: &[i32]) -> i32 {
-    if parameter.mode == ParameterMode::Position {
-        op_codes[parameter.value as usize]
-    } else {
-        parameter.value
+fn get_parameter_value(parameter: &Parameter, op_codes: &[i64], relative_base: i64) -> i64 {
+    match parameter.mode {
+        ParameterMode::Position => op_codes[parameter.value as usize],
+        ParameterMode::Immediate => parameter.value,
+        ParameterMode::Relative => op_codes[(relative_base + parameter.value) as usize]
     }
 }
 
-fn get_next_instruction(op_codes: &[i32], current_index: &mut usize) -> Instruction {
+fn get_next_instruction(op_codes: &[i64], current_index: &mut usize) -> Instruction {
     let metadata = extract_numbers(op_codes[*current_index] as u32);
     let metadata_len = metadata.len();
 
@@ -94,8 +98,12 @@ fn get_next_instruction(op_codes: &[i32], current_index: &mut usize) -> Instruct
     for i in 1..=number_of_params {
         parameters.push(Parameter {
             value: op_codes[*current_index + i],
-            mode: if metadata_len >= 2 + i && metadata[metadata_len - 2 - i] == 1 {
-                ParameterMode::Immediate
+            mode: if metadata_len >= 2 + i {
+                match metadata[metadata_len - 2 - i] {
+                    1 => ParameterMode::Immediate,
+                    2 => ParameterMode::Relative,
+                    _ => ParameterMode::Position
+                }
             } else {
                 ParameterMode::Position
             },
@@ -120,6 +128,7 @@ fn number_to_opcode(number: u8) -> OpCode {
         6 => OpCode::JumpIfFalse,
         7 => OpCode::LessThan,
         8 => OpCode::Equal,
+        9 => OpCode::AdjustRelativeBase,
         99 => OpCode::End,
         _ => OpCode::Unknown
     }
@@ -129,7 +138,7 @@ fn number_of_parameters(op_code: &OpCode) -> u8 {
     match op_code {
         OpCode::Add | OpCode::Multiply | OpCode::LessThan | OpCode::Equal => 3,
         OpCode::JumpIfTrue | OpCode::JumpIfFalse => 2,
-        OpCode::Input | OpCode::Output => 1,
+        OpCode::Input | OpCode::Output | OpCode::AdjustRelativeBase => 1,
         _ => 0
     }
 }
@@ -142,7 +151,7 @@ struct Instruction {
 
 #[derive(Debug, PartialEq)]
 struct Parameter {
-    value: i32,
+    value: i64,
     mode: ParameterMode,
 }
 
@@ -156,6 +165,7 @@ enum OpCode {
     JumpIfFalse,
     LessThan,
     Equal,
+    AdjustRelativeBase,
     End,
     Unknown,
 }
@@ -164,6 +174,7 @@ enum OpCode {
 enum ParameterMode {
     Position,
     Immediate,
+    Relative,
 }
 
 #[cfg(test)]
@@ -205,7 +216,7 @@ mod tests {
         let mut array = [101, 2, 3, 3, 1102, 90, 80, 1, 99];
         let mut current_position = 0usize;
 
-        run_program(&mut array, &Vec::new(), &mut current_position);
+        run_program(&mut array, &Vec::new(), &mut current_position, &mut 0);
 
         assert_eq!(array, [101, 7200, 3, 5, 1102, 90, 80, 1, 99]);
     }

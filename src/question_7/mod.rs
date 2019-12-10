@@ -7,9 +7,9 @@ use std::rc::Rc;
 
 pub fn solve_a() {
     let contents = read_content("src/question_7/input.txt");
-    let numbers: Vec<i32> = contents.split(",").map(|number| i32::from_str(number).unwrap()).collect();
+    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
 
-    let mut op_codes_master = [0i32; 1024];
+    let mut op_codes_master = [0i64; 1024];
     for (i, number) in numbers.iter().enumerate() {
         op_codes_master[i] = *number
     }
@@ -44,9 +44,9 @@ pub fn solve_a() {
 
 pub fn solve_b() {
     let contents = read_content("src/question_7/input.txt");
-    let numbers: Vec<i32> = contents.split(",").map(|number| i32::from_str(number).unwrap()).collect();
+    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
 
-    let mut op_codes_master = [0i32; 1024];
+    let mut op_codes_master = [0i64; 1024];
     for (i, number) in numbers.iter().enumerate() {
         op_codes_master[i] = *number
     }
@@ -78,7 +78,7 @@ pub fn solve_b() {
     println!("Max output is {}", max_output);
 }
 
-fn run_amplifiers(op_codes: &mut [i32], phase_sequence: &[i32]) -> i32 {
+fn run_amplifiers(op_codes: &mut [i64], phase_sequence: &[i64]) -> i64 {
     let mut output = 0;
     for phase in phase_sequence {
         // TODO: op_codes should be cloned each time?
@@ -88,7 +88,7 @@ fn run_amplifiers(op_codes: &mut [i32], phase_sequence: &[i32]) -> i32 {
     output
 }
 
-fn run_amplifiers_feedback_loop(op_codes: &[i32], phase_sequence: &[i32]) -> i32 {
+fn run_amplifiers_feedback_loop(op_codes: &[i64], phase_sequence: &[i64]) -> i64 {
     let mut current_amplifier_index = 0usize;
     let mut amplifiers = vec![
         op_codes.clone().to_vec(),
@@ -121,9 +121,9 @@ fn run_amplifiers_feedback_loop(op_codes: &[i32], phase_sequence: &[i32]) -> i32
     output
 }
 
-fn run_amplifier(op_codes: &mut [i32], phase: i32, input: i32, current_position: &mut usize) -> i32 {
+fn run_amplifier(op_codes: &mut [i64], phase: i64, input: i64, current_position: &mut usize) -> i64 {
     let inputs = vec![phase, input];
-    run_program(op_codes, &inputs, current_position).unwrap_or_else(|| -1)
+    run_program(op_codes, &inputs, current_position, &mut 0).unwrap_or_else(|| -1)
 }
 
 #[cfg(test)]
