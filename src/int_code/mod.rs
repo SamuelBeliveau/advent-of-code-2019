@@ -10,26 +10,29 @@ pub fn run_program(op_codes: &mut [i64], inputs: &Vec<i64>, current_position: &m
             OpCode::Add => {
                 let first_operand = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
                 let second_operand = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
+                let result_position = get_parameter_position(&current_instruction.parameters[2], *relative_base);
 
-                op_codes[current_instruction.parameters[2].value as usize] = first_operand + second_operand;
+                op_codes[result_position] = first_operand + second_operand;
             }
             OpCode::Multiply => {
                 let first_operand = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
                 let second_operand = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
+                let result_position = get_parameter_position(&current_instruction.parameters[2], *relative_base);
 
-                op_codes[current_instruction.parameters[2].value as usize] = first_operand * second_operand;
+                op_codes[result_position] = first_operand * second_operand;
             }
             OpCode::Input => {
+                let result_position = get_parameter_position(&current_instruction.parameters[0], *relative_base);
                 if inputs.len() > input_index {
                     println!("Reading input: {}", inputs[input_index]);
-                    op_codes[current_instruction.parameters[0].value as usize] = inputs[input_index];
+                    op_codes[result_position] = inputs[input_index];
                     input_index += 1;
                 } else {
                     let mut input = String::new();
                     println!("Please input a number: ");
                     match stdin().read_line(&mut input) {
                         Ok(n) => {
-                            op_codes[current_instruction.parameters[0].value as usize] = input.trim().parse().unwrap();
+                            op_codes[result_position] = input.trim().parse().unwrap();
                         }
                         Err(error) => println!("error: {}", error)
                     }
@@ -57,12 +60,14 @@ pub fn run_program(op_codes: &mut [i64], inputs: &Vec<i64>, current_position: &m
             OpCode::LessThan => {
                 let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
                 let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
-                op_codes[current_instruction.parameters[2].value as usize] = if first_param < second_param { 1 } else { 0 };
+                let result_position = get_parameter_position(&current_instruction.parameters[2], *relative_base);
+                op_codes[result_position] = if first_param < second_param { 1 } else { 0 };
             }
             OpCode::Equal => {
                 let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
                 let second_param = get_parameter_value(&current_instruction.parameters[1], &op_codes, *relative_base);
-                op_codes[current_instruction.parameters[2].value as usize] = if first_param == second_param { 1 } else { 0 };
+                let result_position = get_parameter_position(&current_instruction.parameters[2], *relative_base);
+                op_codes[result_position] = if first_param == second_param { 1 } else { 0 };
             }
             OpCode::AdjustRelativeBase => {
                 let first_param = get_parameter_value(&current_instruction.parameters[0], &op_codes, *relative_base);
@@ -82,6 +87,14 @@ fn get_parameter_value(parameter: &Parameter, op_codes: &[i64], relative_base: i
         ParameterMode::Position => op_codes[parameter.value as usize],
         ParameterMode::Immediate => parameter.value,
         ParameterMode::Relative => op_codes[(relative_base + parameter.value) as usize]
+    }
+}
+
+fn get_parameter_position(parameter: &Parameter, relative_base: i64) -> usize {
+    match parameter.mode {
+        ParameterMode::Position => parameter.value as usize,
+        ParameterMode::Immediate => panic!("Cannot get position in immediate mode"),
+        ParameterMode::Relative => (relative_base + parameter.value) as usize
     }
 }
 
