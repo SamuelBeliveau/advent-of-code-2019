@@ -1,7 +1,18 @@
 use std::collections::HashMap;
 use itertools::Itertools;
+use regex::internal::Input;
+use crate::util::read_content;
 
-pub fn solve_a() {}
+pub fn solve_a() {
+    let content = read_content("src/question_10/input.txt");
+    let asteroids = parse_asteroids(&content[..]);
+    let best = find_best_asteroid(&asteroids);
+    println!("Best: {:?}", best);
+}
+
+pub fn solve_b() {
+    // 0,inf => inf,0 => 0,-inf => -inf,0
+}
 
 fn parse_asteroids(map: &str) -> Vec<Asteroid> {
     let mut asteroids = Vec::new();
@@ -15,37 +26,27 @@ fn parse_asteroids(map: &str) -> Vec<Asteroid> {
     asteroids
 }
 
-fn find_best_asteroid(asteroids: &Vec<Asteroid>) -> Option<&Asteroid> {
+fn find_best_asteroid(asteroids: &Vec<Asteroid>) -> (Option<&Asteroid>, usize) {
+    let mut best: (Option<&Asteroid>, usize) = (None, 0);
+
     for asteroid in asteroids.iter() {
-        let asteroid_slopes: HashMap<_, _> = asteroids.iter().map(|a| (calculate_slope(asteroid, a), a)).into_group_map();
+        let asteroid_slopes: HashMap<_, _> = asteroids.iter()
+            .filter(|a| *a != asteroid)
+            .map(|a| (calculate_unit_vector(asteroid, a), a))
+            .map(|((x, y), a)| ((format!("{:.10}", x), format!("{:.10}", y)), a))
+            .into_group_map();
+        if asteroid_slopes.len() > best.1 {
+            best = (Some(asteroid), asteroid_slopes.len());
+        }
     }
 
-    None
-
-    // 5,6 vs 2,6 => -3,0
-    // 5,6 vs 1,6 => -4,0
-    // 5,6 vs 9,6 => 4,0
-    // 5,6 vs 8,5 => 3,-1
-    // 5,6 vs 14,3 => 9,-3
+    best
 }
 
-fn calculate_slope(first: &Asteroid, second: &Asteroid) -> Slope {
-    if second.x - first.x == 0 {
-        return Slope::Vertical(second.y - first.y);
-    }
-
-    if second.y - first.y == 0 {
-        return Slope::Horizontal(second.x - first.x);
-    }
-
-    Slope::Diagonal((second.y - first.y) as f32 / (second.x - first.x) as f32)
-}
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-enum Slope {
-    Horizontal(i32),
-    Vertical(i32),
-    Diagonal(f32),
+fn calculate_unit_vector(first: &Asteroid, second: &Asteroid) -> (f64, f64) {
+    let vector = ((second.x - first.x) as f64, (second.y - first.y) as f64);
+    let magnitude = (vector.0.powf(2.0) + vector.1.powf(2.0)).sqrt();
+    (vector.0 / magnitude, (vector.1 / magnitude))
 }
 
 #[derive(Debug, PartialEq)]
@@ -84,24 +85,6 @@ mod tests {
     }
 
     #[test]
-    fn test_calculate_slope_vertical() {
-        let slope = calculate_slope(&Asteroid::new(6, 7), &Asteroid::new(6, 2));
-        assert_eq!(slope, Slope::Vertical(-5));
-    }
-
-    #[test]
-    fn test_calculate_slope_horizontal() {
-        let slope = calculate_slope(&Asteroid::new(2, 5), &Asteroid::new(6, 5));
-        assert_eq!(slope, Slope::Horizontal(4));
-    }
-
-    #[test]
-    fn test_calculate_slope_diagonal() {
-        let slope = calculate_slope(&Asteroid::new(9, 5), &Asteroid::new(6, 11));
-        assert_eq!(slope, Slope::Diagonal(-2.0));
-    }
-
-    #[test]
     fn test_find_best_asteroid() {
         let map = "\
         ......#.#.\n\
@@ -117,8 +100,29 @@ mod tests {
 
         let asteroids = parse_asteroids(map);
         let best = find_best_asteroid(&asteroids);
-        assert_eq!(best.is_some(), true);
-        assert_eq!(best.unwrap().x, 5);
-        assert_eq!(best.unwrap().y, 8);
+        assert_eq!(best.0.is_some(), true);
+        assert_eq!(best.0.unwrap().x, 5);
+        assert_eq!(best.0.unwrap().y, 8);
+    }
+
+    #[test]
+    fn test_find_best_asteroid_2() {
+        let map = "\
+        .#..#\n\
+        .....\n\
+        #####\n\
+        ....#\n\
+        ...##";
+
+        let asteroids = parse_asteroids(map);
+        let best = find_best_asteroid(&asteroids);
+        assert_eq!(best.0.is_some(), true);
+        assert_eq!(best.0.unwrap().x, 3);
+        assert_eq!(best.0.unwrap().y, 4);
+    }
+
+    #[test]
+    fn test_calculate_unit_vector() {
+        assert_eq!(calculate_unit_vector(&Asteroid::new(5, 6), &Asteroid::new(9, 2)), (0.7071067811865475, -0.7071067811865475));
     }
 }
