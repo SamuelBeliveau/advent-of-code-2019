@@ -10,8 +10,9 @@ mod question_6;
 mod question_7;
 mod question_8;
 mod question_9;
+mod question_10;
 mod int_code;
 
 fn main() {
-    question_9::solve_a();
+    question_10::solve_a();
 }
