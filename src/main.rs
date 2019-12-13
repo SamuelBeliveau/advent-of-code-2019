@@ -14,5 +14,5 @@ mod question_10;
 mod int_code;
 
 fn main() {
-    question_10::solve_a();
+    question_10::solve_b();
 }
