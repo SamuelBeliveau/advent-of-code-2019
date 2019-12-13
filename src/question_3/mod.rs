@@ -1,5 +1,4 @@
 use std::ops::Add;
-use std::cmp::Ordering;
 use crate::util::read_content;
 
 pub fn solve_a() {
@@ -22,7 +21,7 @@ pub fn solve_b() {
 
 fn get_closest_intersection_distance(paths_str: &Vec<&str>) -> Option<u32> {
     let intersections = get_intersections(paths_str);
-    let mut intersection_distances: Vec<u32> = intersections.iter().map(|i| (i.point.x.abs() + i.point.y.abs()) as u32).collect();
+    let intersection_distances: Vec<u32> = intersections.iter().map(|i| (i.point.x.abs() + i.point.y.abs()) as u32).collect();
 
     println!("distances: {:?}", intersection_distances);
 
@@ -31,7 +30,7 @@ fn get_closest_intersection_distance(paths_str: &Vec<&str>) -> Option<u32> {
 
 fn get_minimum_intersection_steps(paths_str: &Vec<&str>) -> Option<u32> {
     let intersections = get_intersections(paths_str);
-    let mut intersection_steps: Vec<u32> = intersections.iter().map(|i| i.steps).collect();
+    let intersection_steps: Vec<u32> = intersections.iter().map(|i| i.steps).collect();
 
     println!("steps: {:?}", intersection_steps);
 

@@ -3,7 +3,7 @@ use crate::util::read_content;
 use std::collections::HashMap;
 
 pub fn solve_a() {
-    let mut contents = read_content("src/question_6/input.txt");
+    let contents = read_content("src/question_6/input.txt");
     let orbits: HashMap<_,_> = contents.lines().map(|l| extract_orbit_info(l)).collect();
     let mut orbits_count = 0u32;
     for (k, _) in &orbits {
@@ -13,7 +13,7 @@ pub fn solve_a() {
 }
 
 pub fn solve_b() {
-    let mut contents = read_content("src/question_6/input.txt");
+    let contents = read_content("src/question_6/input.txt");
     let orbits: HashMap<_,_> = contents.lines().map(|l| extract_orbit_info(l)).collect();
 
     let mut you_path = Vec::new();

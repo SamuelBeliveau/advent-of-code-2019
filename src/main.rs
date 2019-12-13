@@ -1,17 +1,16 @@
 extern crate regex;
 
-mod util;
-mod question_1;
-mod question_2;
-mod question_3;
-mod question_4;
-mod question_5;
-mod question_6;
-mod question_7;
-mod question_8;
-mod question_9;
-mod question_10;
-mod int_code;
+pub mod util;
+pub mod question_1;
+pub mod question_2;
+pub mod question_3;
+pub mod question_4;
+pub mod question_6;
+pub mod question_7;
+pub mod question_8;
+pub mod question_9;
+pub mod question_10;
+pub mod int_code;
 
 fn main() {
     question_10::solve_b();

@@ -22,7 +22,7 @@ pub fn solve_b() {
     let contents = read_content("src/question_2/input.txt");
     let numbers: Vec<usize> = contents.split(",").map(|number| usize::from_str(number).unwrap()).collect();
 
-    let mut op_codes = [0usize; 512];
+    let mut op_codes;
 
     for i in 0..=99 {
         for j in 0..=99 {

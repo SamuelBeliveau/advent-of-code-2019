@@ -31,7 +31,7 @@ pub fn run_program(op_codes: &mut [i64], inputs: &Vec<i64>, current_position: &m
                     let mut input = String::new();
                     println!("Please input a number: ");
                     match stdin().read_line(&mut input) {
-                        Ok(n) => {
+                        Ok(_) => {
                             op_codes[result_position] = input.trim().parse().unwrap();
                         }
                         Err(error) => println!("error: {}", error)

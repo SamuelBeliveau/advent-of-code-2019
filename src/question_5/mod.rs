@@ -1,5 +1,4 @@
-use crate::util::{extract_numbers, read_content};
-use std::io::stdin;
+use crate::util::{read_content};
 use std::str::FromStr;
 use crate::int_code::run_program;
 

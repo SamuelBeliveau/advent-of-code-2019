@@ -3,7 +3,6 @@ use std::str::FromStr;
 use crate::int_code::run_program;
 use itertools::Itertools;
 use std::cell::RefCell;
-use std::rc::Rc;
 
 pub fn solve_a() {
     let contents = read_content("src/question_7/input.txt");
@@ -102,7 +101,7 @@ fn run_amplifiers_feedback_loop(op_codes: &[i64], phase_sequence: &[i64]) -> i64
 
     let mut current_amplifier;
 
-    for i in 0..phase_sequence.len() {
+    for _ in 0..phase_sequence.len() {
         current_amplifier = &mut amplifiers[current_amplifier_index];
         output = run_amplifier(&mut current_amplifier[..], phase_sequence[current_amplifier_index], output, &mut amplifiers_positions[current_amplifier_index].borrow_mut());
         current_amplifier_index = (current_amplifier_index + 1) % 5;

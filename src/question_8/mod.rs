@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 
 pub fn solve_a() {
     let contents = read_content("src/question_8/input.txt");
-    let mut layers = extract_layers(&contents, 25, 6);
+    let layers = extract_layers(&contents, 25, 6);
 
     let min_layer = layers.iter()
         .map(|layer| (layer, layer.color_counts.get(&0).unwrap_or_else(|| &0)))
@@ -18,7 +18,7 @@ pub fn solve_a() {
 
 pub fn solve_b() {
     let contents = read_content("src/question_8/input.txt");
-    let mut layers = extract_layers(&contents, 25, 6);
+    let layers = extract_layers(&contents, 25, 6);
     let flattened = flatten_layers(&layers);
     for i in 0..6 {
         for j in i * 25..(i + 1) * 25 {

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use itertools::Itertools;
-use regex::internal::Input;
 use crate::util::read_content;
 use std::cmp::Ordering;
 
@@ -78,7 +77,7 @@ fn destroy_until<'a>(base: &Asteroid, asteroids: &'a Vec<Asteroid>, last: u32) -
                 break;
             }
 
-            let mut a = asteroid_degrees.get_mut(i).unwrap();
+            let a = asteroid_degrees.get_mut(i).unwrap();
             if last_angle == a.0 {
                 continue;
             }
@@ -134,7 +133,6 @@ impl Asteroid {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::f64::consts::PI;
 
     #[test]
     fn test_parse_asteroids() {
