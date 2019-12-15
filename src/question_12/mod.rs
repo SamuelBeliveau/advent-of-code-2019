@@ -40,12 +40,12 @@ fn run_step(moons: &mut Vec<Moon>) {
             .filter(|(idx, _)| *idx != i)
             .map(|(_, m)| m)
             .collect();
-        let mut moon = moons.get_mut(i).unwrap();
+        let moon = moons.get_mut(i).unwrap();
         apply_gravity(moon, &other_moons);
     }
 
     for i in 0..moons.len() {
-        let mut moon = moons.get_mut(i).unwrap();
+        let moon = moons.get_mut(i).unwrap();
         apply_velocity(moon);
     }
 }

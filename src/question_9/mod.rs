@@ -1,16 +1,8 @@
 use crate::int_code::run_program;
-use crate::util::read_content;
-use std::str::FromStr;
+use crate::util::{read_op_codes};
 
 pub fn solve_a() {
-    let contents = read_content("src/question_9/input.txt");
-    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
-    println!("Numbers count: {}", numbers.len());
-
-    let mut op_codes_master = [0i64; 2048];
-    for (i, number) in numbers.iter().enumerate() {
-        op_codes_master[i] = *number
-    }
+    let mut op_codes_master = read_op_codes("src/question_9/input.txt");
 
     run_sensor_boost(&mut op_codes_master, &vec![2]);
 }

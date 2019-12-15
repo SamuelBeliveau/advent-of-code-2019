@@ -1,17 +1,10 @@
-use crate::util::read_content;
-use std::str::FromStr;
+use crate::util::{read_op_codes};
 use crate::int_code::run_program;
 use itertools::Itertools;
 use std::cell::RefCell;
 
 pub fn solve_a() {
-    let contents = read_content("src/question_7/input.txt");
-    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
-
-    let mut op_codes_master = [0i64; 1024];
-    for (i, number) in numbers.iter().enumerate() {
-        op_codes_master[i] = *number
-    }
+    let op_codes_master = read_op_codes("src/question_7/input.txt");
 
     let mut max_output = 0;
 
@@ -42,13 +35,7 @@ pub fn solve_a() {
 }
 
 pub fn solve_b() {
-    let contents = read_content("src/question_7/input.txt");
-    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
-
-    let mut op_codes_master = [0i64; 1024];
-    for (i, number) in numbers.iter().enumerate() {
-        op_codes_master[i] = *number
-    }
+    let mut op_codes_master = read_op_codes("src/question_7/input.txt");
 
     let mut max_output = 0;
 

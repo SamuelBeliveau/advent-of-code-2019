@@ -1,29 +1,16 @@
 use std::collections::HashMap;
 use crate::int_code::run_program;
-use crate::util::read_content;
-use std::str::FromStr;
+use crate::util::{read_op_codes};
 
 pub fn solve_a() {
-    let contents = read_content("src/question_11/input.txt");
-    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
-
-    let mut op_codes = [0i64; 2048];
-    for (i, number) in numbers.iter().enumerate() {
-        op_codes[i] = *number
-    }
+    let mut op_codes = read_op_codes("src/question_11/input.txt");
 
     let amount = paint(&mut op_codes, 0).len();
     println!("Amount: {}", amount);
 }
 
 pub fn solve_b() {
-    let contents = read_content("src/question_11/input.txt");
-    let numbers: Vec<i64> = contents.split(",").map(|number| i64::from_str(number).unwrap()).collect();
-
-    let mut op_codes = [0i64; 2048];
-    for (i, number) in numbers.iter().enumerate() {
-        op_codes[i] = *number
-    }
+    let mut op_codes = read_op_codes("src/question_11/input.txt");
 
     let painted = paint(&mut op_codes, 1);
     let mut boundaries = (std::i64::MAX, std::i64::MIN, std::i64::MAX, std::i64::MIN);
