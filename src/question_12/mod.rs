@@ -19,8 +19,17 @@ fn calculate_energy(moons: &Vec<Moon>) -> i32 {
 }
 
 fn run_steps(moons: &mut Vec<Moon>, n: usize) {
-    for _ in 0..n {
+    for step in 0..n {
         run_step(moons);
+        print!("Step {:>#4} ", step);
+        for i in 0..moons.len() {
+            print!("({:>#4}[{:>#4}],{:>#4}[{:>#4}],{:>#4}[{:>#4}])    ",
+                   moons[i].position.x, moons[i].velocity.x,
+                   moons[i].position.y, moons[i].velocity.y,
+                   moons[i].position.z, moons[i].velocity.z
+            );
+        }
+        println!("");
     }
 }
 
