@@ -123,7 +123,9 @@ fn get_next_instruction(op_codes: &[i64], current_index: &mut usize) -> Instruct
         });
     }
 
-    *current_index = *current_index + number_of_params + 1;
+    if op_code != OpCode::End {
+        *current_index = *current_index + number_of_params + 1;
+    }
 
     Instruction {
         op_code,

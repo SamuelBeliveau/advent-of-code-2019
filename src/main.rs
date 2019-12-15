@@ -12,8 +12,9 @@ pub mod question_9;
 pub mod question_10;
 pub mod question_11;
 pub mod question_12;
+pub mod question_13;
 pub mod int_code;
 
 fn main() {
-    question_12::solve_a();
+    question_13::solve_ab();
 }

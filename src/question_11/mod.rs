@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use crate::int_code::run_program;
-use crate::util::{read_op_codes};
+use crate::util::{read_op_codes, print_positions};
 
 pub fn solve_a() {
     let mut op_codes = read_op_codes("src/question_11/input.txt");
@@ -13,28 +13,8 @@ pub fn solve_b() {
     let mut op_codes = read_op_codes("src/question_11/input.txt");
 
     let painted = paint(&mut op_codes, 1);
-    let mut boundaries = (std::i64::MAX, std::i64::MIN, std::i64::MAX, std::i64::MIN);
-    for key in painted.keys() {
-        if key.0 < boundaries.0 {
-            boundaries.0 = key.0;
-        }
-        if key.0 > boundaries.1 {
-            boundaries.1 = key.0;
-        }
-        if key.1 < boundaries.2 {
-            boundaries.2 = key.0;
-        }
-        if key.1 > boundaries.3 {
-            boundaries.3 = key.0;
-        }
-    }
 
-    for y in boundaries.2..=boundaries.3 {
-        for x in boundaries.0..=boundaries.1 {
-            print!("{}", if *painted.get(&(x, y)).unwrap_or_else(|| &0) == 0 { " " } else { "#" });
-        }
-        println!("");
-    }
+    print_positions(&painted, |c| if *c.unwrap_or_else(|| &0) == 0 { " " } else { "#" });
 }
 
 fn paint(op_codes: &mut [i64], starting_color: i64) -> HashMap<(i64, i64), i64> {
