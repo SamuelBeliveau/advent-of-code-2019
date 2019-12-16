@@ -1,7 +1,7 @@
 use regex::Regex;
 use std::str::FromStr;
 use crate::util::read_content;
-use std::collections::HashMap;
+use std::collections::{HashMap};
 
 pub fn solve_a() {
     let contents = read_content("src/question_14/input.txt");
@@ -13,16 +13,24 @@ pub fn solve_a() {
     recipe.insert("ORE".to_string(), Reaction { inputs: Vec::new(), output: Ingredient::new("ORE".to_string(), 1) });
 
     let mut store = HashMap::new();
+    let mut averages = [0f64; 50];
+    for i in 0.. {
+        required_quantities(&recipe, &mut store, &"FUEL".to_string());
+        let result = store.get(&"ORE".to_string()).unwrap().1;
+        let average = result as f64 / (i + 1) as f64;
+        averages[i % 50] = average;
 
-    required_quantities(&recipe, &mut store, &"FUEL".to_string());
-
-    println!("Total: {}", store.get(&"ORE".to_string()).unwrap().1);
+        if i % 10 == 0 {
+            let average_average = averages.iter().sum::<f64>() as f64 / averages.len() as f64;
+            println!("Total after {}: {} (avg: {}) (avg_avg: {})", i + 1, result, average, average_average);
+        }
+    }
 }
 
 fn required_quantities(recipe: &HashMap<String, Reaction>, store: &mut HashMap<String, (u64, u64)>, ingredient_name: &String) {
     if let Some(reaction) = recipe.get(ingredient_name) {
         for input in &reaction.inputs {
-            println!("Need {} of {}", input.quantity, input.name);
+//            println!("Need {} of {}", input.quantity, input.name);
             let stored = store.entry(input.name.clone()).or_insert((0, 0));
 
             if stored.0 >= input.quantity {
@@ -30,10 +38,10 @@ fn required_quantities(recipe: &HashMap<String, Reaction>, store: &mut HashMap<S
                 continue;
             }
 
-            println!("Not enough in store to fully cover ({})...", stored.0);
+//            println!("Not enough in store to fully cover ({})...", stored.0);
             let new_quantity = input.quantity - stored.0;
             stored.0 = 0;
-            println!("Getting what we can from the store, new qty is {}...", new_quantity);
+//            println!("Getting what we can from the store, new qty is {}...", new_quantity);
 
             let ingredient_reaction = recipe.get(&input.name).unwrap();
             let times = (new_quantity as f64 / ingredient_reaction.output.quantity as f64).ceil() as u64;
@@ -47,8 +55,8 @@ fn required_quantities(recipe: &HashMap<String, Reaction>, store: &mut HashMap<S
         return;
     }
 
-    println!("No reaction for {}", ingredient_name);
-    println!("Store: {:#?}", store);
+//    println!("No reaction for {}", ingredient_name);
+//    println!("Store: {:#?}", store);
 }
 
 fn parse_reaction(line: &str) -> Reaction {
