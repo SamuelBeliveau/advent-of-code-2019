@@ -18,5 +18,5 @@ pub mod question_15;
 pub mod int_code;
 
 fn main() {
-    question_15::solve_a();
+    question_15::solve_b();
 }
